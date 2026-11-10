@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRẮC NGHIỆM BÀI TẬP ĐỊA THPT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #15803d;
+      --primary-hover: #166534;
+      --primary-light: #f0fdf4;
+      --secondary: #0284c7;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --correct: #16a34a;
+      --incorrect: #dc2626;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Be Vietnam Pro', sans-serif; }
+    body { background-color: var(--bg); color: var(--text); line-height: 1.6; padding: 20px 12px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 800px; background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); overflow: hidden; }
+
+    header { background: linear-gradient(135deg, #166534 0%, #15803d 100%); color: white; padding: 24px; text-align: center; }
+    header h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 4px; text-transform: uppercase; }
+    header p { font-size: 0.9rem; opacity: 0.9; }
+
+    .quiz-body { padding: 24px; }
+    .quiz-progress { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-weight: 600; font-size: 0.9rem; color: var(--text-muted); }
+    .progress-bar-bg { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin-bottom: 24px; }
+    .progress-bar-fill { height: 100%; background: var(--primary); width: 5%; transition: width 0.3s ease; }
+
+    .question-title { font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 16px; }
+    .img-box { width: 100%; height: 260px; border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; background: #e2e8f0; border: 1px solid var(--border); position: relative; }
+    .img-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .options-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+    .option-btn { display: flex; align-items: center; padding: 14px 18px; border: 2px solid var(--border); border-radius: var(--radius); background: white; cursor: pointer; text-align: left; font-size: 0.95rem; font-weight: 500; transition: all 0.2s ease; }
+    .option-btn:hover { border-color: var(--primary); background: var(--primary-light); }
+    .option-btn.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary-hover); font-weight: 700; }
+    .opt-letter { width: 32px; height: 32px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 14px; flex-shrink: 0; }
+    .option-btn.selected .opt-letter { background: var(--primary); color: white; }
+
+    .nav-btns { display: flex; justify-content: space-between; gap: 12px; }
+    .btn { padding: 12px 24px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .btn-prev { background: #e2e8f0; color: #475569; }
+    .btn-prev:hover { background: #cbd5e1; }
+    .btn-next { background: var(--primary); color: white; }
+    .btn-next:hover { background: var(--primary-hover); }
+
+    .result-screen { display: none; padding: 32px 24px; text-align: center; }
+    .result-badge { width: 120px; height: 120px; margin: 0 auto 16px; border-radius: 50%; overflow: hidden; border: 4px solid var(--primary); background: #f0fdf4; }
+    .result-badge img { width: 100%; height: 100%; object-fit: cover; }
+    .result-score { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
+    .result-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 12px; }
+    .result-desc { text-align: left; background: #f8fafc; padding: 16px; border-radius: 8px; border-left: 4px solid var(--primary); font-size: 0.95rem; margin-bottom: 24px; color: #334155; }
+
+    .review-section { text-align: left; margin-top: 24px; }
+    .review-card { padding: 14px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; font-size: 0.9rem; }
+    .review-card.correct { border-left: 4px solid var(--correct); background: #f0fdf4; }
+    .review-card.incorrect { border-left: 4px solid var(--incorrect); background: #fef2f2; }
+
+    .btn-restart { width: 100%; padding: 14px; background: var(--primary); color: white; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; margin-top: 16px; font-size: 1rem; }
+    .btn-restart:hover { background: var(--primary-hover); }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>TRẮC NGHIỆM BÀI TẬP ĐỊA THPT</h1>
+      <p>Ngân hàng 20 câu hỏi trắc nghiệm Địa lý tự nhiên & Kinh tế Việt Nam</p>
+    </header>
+
+    <!-- MÀN HÌNH CÂU HỎI -->
+    <div class="quiz-body" id="quiz-screen">
+      <div class="quiz-progress">
+        <span id="q-number">Câu 1 / 20</span>
+        <span id="timer">Thời gian: 00:00</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+
+      <div class="question-title" id="q-text">Đang tải câu hỏi...</div>
+
+      <div class="img-box">
+        <img id="q-img" src="" alt="Hình minh họa địa lý" onerror="this.src='https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=800&auto=format&fit=crop'">
+      </div>
+
+      <div class="options-grid" id="options-container"></div>
+
+      <div class="nav-btns">
+        <button class="btn btn-prev" id="prev-btn" onclick="prevQuestion()" disabled>Câu Trước</button>
+        <button class="btn btn-next" id="next-btn" onclick="nextQuestion()">Câu Tiếp</button>
+      </div>
+    </div>
+
+    <!-- MÀN HÌNH KẾT QUẢ -->
+    <div class="result-screen" id="result-screen">
+      <div class="result-badge">
+        <img id="res-img" src="" alt="Kết quả">
+      </div>
+      <div class="result-score" id="res-score">0 / 10 Điểm</div>
+      <div class="result-title" id="res-title">Tiêu đề kết quả</div>
+      <div class="result-desc" id="res-desc">Đoạn văn đánh giá chi tiết...</div>
+
+      <h3 style="text-align: left; margin-bottom: 12px;">Bảng Chi Tiết Đáp Án:</h3>
+      <div class="review-section" id="review-container"></div>
+
+      <button class="btn-restart" onclick="restartQuiz()">Làm Lại Bài Thi</button>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: "Câu 1: Địa hình vùng núi Đông Bắc nước ta có đặc điểm cốt lõi nào sau đây?",
+        img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop",
+        options: ["Địa hình núi cao đồ sộ nhất cả nước", "Địa hình đồi núi thấp, hướng cánh cung", "Địa hình cao ở hai đầu, thấp ở giữa", "Địa hình gồm các cao nguyên xếp tầng"],
+        answer: 1,
+        explain: "Vùng núi Đông Bắc đặc trưng bởi địa hình núi thấp và 4 cánh cung lớn chụm lại ở Ngân Sơn."
+      },
+      {
+        question: "Câu 2: Gió mùa Đông Bắc khi thổi qua biển vào nước ta ở nửa sau mùa đông gây ra dạng thời tiết đặc trưng nào?",
+        img: "https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=800&auto=format&fit=crop",
+        options: ["Thời tiết hanh khô, lạnh giá", "Thời tiết mưa rào và dông diện rộng", "Thời tiết nồm ẩm và mưa phun", "Thời tiết nắng nóng, gay gắt"],
+        answer: 2,
+        explain: "Nửa sau mùa đông, khối khí lạnh lệch đông đi qua biển được tăng cường ẩm gây mưa phùn cho Bắc Bộ."
+      },
+      {
+        question: "Câu 3: Đô thị hóa ở nước ta hiện nay có đặc điểm nổi bật nào sau đây?",
+        img: "https://images.unsplash.com/photo-1477959858617-67f30ac4ce78?w=800&auto=format&fit=crop",
+        options: ["Tỉ lệ dân đô thị tăng, phân bố rất đều", "Quá trình đô thị hóa diễn ra nhanh chóng", "Trình độ đô thị hóa chưa cao, phân bố chưa đều", "Phân bố đô thị tập trung chủ yếu ở miền núi"],
+        answer: 2,
+        explain: "Nước ta có trình độ đô thị hóa còn thấp so với thế giới và mật độ đô thị phân bố không đều giữa các vùng."
+      },
+      {
+        question: "Câu 4: Vùng biển Việt Nam có đặc điểm nào sau đây ảnh hưởng lớn đến phát triển kinh tế?",
+        img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop",
+        options: ["Nhiệt đới ẩm gió mùa, giàu tài nguyên sinh vật và khoáng sản", "Vùng biển nông, ít bão và đầm phá", "Khí hậu lạnh giá quanh năm", "Nước biển có độ mặn cực kỳ cao"],
+        answer: 0,
+        explain: "Biển Đông mang tính chất nhiệt đới ẩm gió mùa với sinh vật phong phú và trữ lượng hải sản lớn."
+      },
+      {
+        question: "Câu 5: Nhóm đất có diện tích lớn nhất ở vùng Đồng bằng sông Cửu Long là gì?",
+        img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&auto=format&fit=crop",
+        options: ["Đất phù sa ngọt", "Đất phèn và đất mặn", "Đất feralit đỏ vàng", "Đất cát ven biển"],
+        answer: 1,
+        explain: "Đất phèn và đất mặn chiếm khoảng 2/3 diện tích tự nhiên của Đồng bằng sông Cửu Long."
+      },
+      {
+        question: "Câu 6: Sông ngòi miền Trung nước ta có đặc điểm thủy văn nổi bật nào?",
+        img: "https://images.unsplash.com/photo-1437482078695-73f5ca6c96e2?w=800&auto=format&fit=crop",
+        options: ["Sông dài, lòng sông rộng và êm đềm", "Sông ngắn, dốc, lũ lên rất nhanh và đột ngột", "Sông không có lũ trong năm", "Lưu lượng nước lớn nhất cả nước"],
+        answer: 1,
+        explain: "Do lãnh thổ hẹp ngang và địa hình núi áp sát biển nên sông ngòi miền Trung thường ngắn và dốc."
+      },
+      {
+        question: "Câu 7: Căn cứ chính để phân chia hoạt động trồng trọt nước ta hiện nay là gì?",
+        img: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800&auto=format&fit=crop",
+        options: ["Sự phân hóa của khí hậu và địa hình", "Số lượng lao động nông nghiệp", "Các tuyến đường giao thông", "Thị trường tiêu thụ nước ngoài"],
+        answer: 0,
+        explain: "Khí hậu và địa hình phân hóa tạo điều kiện hình thành các vùng chuyên canh cây trồng khác nhau."
+      },
+      {
+        question: "Câu 8: Khó khăn lớn nhất về mặt tự nhiên đối với việc phát triển thủy sản ven biển nước ta là gì?",
+        img: "https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&auto=format&fit=crop",
+        options: ["Bão, gió mùa Đông Bắc và hiện tượng sạt lở bờ biển", "Thiếu lao động có tay nghề", "Thị trường biến động", "Thiếu nguồn vốn đầu tư"],
+        answer: 0,
+        explain: "Thiên tai như bão, áp thấp nhiệt đới và gió mùa gây thiệt hại lớn cho nuôi trồng và đánh bắt thủy sản."
+      },
+      {
+        question: "Câu 9: Ngành công nghiệp nào sau đây của nước ta phát triển mạnh nhờ nguồn nhiên liệu tại chỗ phong phú?",
+        img: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&auto=format&fit=crop",
+        options: ["Dệt may xuất khẩu", "Nhiệt điện", "Luyện kim màu", "Sản xuất ô tô"],
+        answer: 1,
+        explain: "Công nghiệp nhiệt điện phát triển mạnh dựa vào than đá (Bắc Bộ) và khí tự nhiên (Nam Bộ)."
+      },
+      {
+        question: "Câu 10: Vấn đề quan trọng nhất trong việc sử dụng tài nguyên rừng ở nước ta hiện nay là gì?",
+        img: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&auto=format&fit=crop",
+        options: ["Chỉ tập trung khai thác gỗ xuất khẩu", "Bảo vệ rừng phòng hộ và tăng độ che phủ rừng", "Tăng cường đốt rừng làm nương rẫy", "Mở rộng diện tích trồng cây ăn quả"],
+        answer: 1,
+        explain: "Bảo vệ rừng và nâng cao độ che phủ rừng giúp nâng cao đa dạng sinh học và cân bằng sinh thái."
+      },
+      {
+        question: "Câu 11: Tây Nguyên có thế mạnh nổi bật nhất cả nước về trồng loại cây nào?",
+        img: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop",
+        options: ["Cây lương thực", "Cây công nghiệp lâu năm", "Cây ăn quả nhiệt đới", "Cây rau màu ngắn ngày"],
+        answer: 1,
+        explain: "Tây Nguyên sở hữu đất feralit trên đá ba zan rộng lớn, phù hợp nhất cho cây cà phê, cao su, tiêu..."
+      },
+      {
+        question: "Câu 12: Đâu là nguyên nhân quan trọng khiến Đông Nam Bộ trở thành vùng dẫn đầu cả nước về kinh tế?",
+        img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop",
+        options: ["Vị trí thuận lợi, hạ tầng tốt, thu hút đầu tư mạnh", "Địa hình toàn núi cao", "Tài nguyên khoáng sản kim loại dồi dào", "Nguồn thủy năng lớn nhất cả nước"],
+        answer: 0,
+        explain: "Đông Nam Bộ có cơ sở hạ tầng phát triển, nguồn lao động lành nghề và sức thu hút vốn FDI rất lớn."
+      },
+      {
+        question: "Câu 13: Tuyến đường giao thông huyết mạch theo hướng Bắc - Nam có ý nghĩa kinh tế lớn nhất nước ta là gì?",
+        img: "https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=800&auto=format&fit=crop",
+        options: ["Đường Hồ Chí Minh", "Quốc lộ 1A", "Quốc lộ 5", "Quốc lộ 22"],
+        answer: 1,
+        explain: "Quốc lộ 1A chạy dọc chiều dài đất nước, nối liền các vùng kinh tế trọng điểm từ Lạng Sơn đến Cà Mau."
+      },
+      {
+        question: "Câu 14: Hoạt động du lịch biển nước ta phát triển mạnh nhất ở vùng nào?",
+        img: "https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?w=800&auto=format&fit=crop",
+        options: ["Duyên hải Nam Trung Bộ", "Đồng bằng sông Hồng", "Đồng bằng sông Cửu Long", "Trung du miền núi Bắc Bộ"],
+        answer: 0,
+        explain: "Nam Trung Bộ sở hữu nhiều bãi biển đẹp nổi tiếng thế giới như Nha Trang, Mỹ Khê, Mũi Né..."
+      },
+      {
+        question: "Câu 15: Cơ cấu ngành kinh tế nước ta hiện nay đang chuyển dịch theo hướng nào?",
+        img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop",
+        options: ["Tăng tỉ trọng Nông nghiệp", "Tăng tỉ trọng Công nghiệp - Xây dựng và Dịch vụ", "Giảm tỉ trọng ngành Dịch vụ", "Chỉ tập trung phát triển khai khoáng"],
+        answer: 1,
+        explain: "Quá trình công nghiệp hóa làm tăng tỉ trọng công nghiệp và dịch vụ, giảm tỉ trọng nông lâm thủy sản."
+      },
+      {
+        question: "Câu 16: Mặt hàng xuất khẩu chủ lực thuộc nhóm hàng nông sản của nước ta bao gồm:",
+        img: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800&auto=format&fit=crop",
+        options: ["Than đá, dầu mỏ", "Gạo, cà phê, hạt điều, thủy sản", "Máy vi tính, linh kiện", "Quần áo thời trang high-end"],
+        answer: 1,
+        explain: "Gạo, cà phê, hạt điều và thủy sản là những mặt hàng nông sản có kim ngạch xuất khẩu hàng đầu."
+      },
+      {
+        question: "Câu 17: Trung du và miền núi Bắc Bộ có thế mạnh nổi bật nhất về phát triển ngành công nghiệp nào?",
+        img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&auto=format&fit=crop",
+        options: ["Thủy điện và khai thác khoáng sản", "Chế biến thủy hải sản", "Sản xuất phần mềm", "Sản xuất hàng tiêu dùng"],
+        answer: 0,
+        explain: "Vùng có tiềm năng thủy điện lớn nhất cả nước (sông Đà) cùng tài nguyên khoáng sản giàu có."
+      },
+      {
+        question: "Câu 18: Tác động tích cực nhất của hội nhập kinh tế quốc tế đối với nước ta là gì?",
+        img: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&auto=format&fit=crop",
+        options: ["Mở rộng thị trường và thu hút vốn đầu tư", "Cạnh tranh gay gắt hơn", "Tăng phụ thuộc vào nước ngoài", "Giảm số lượng doanh nghiệp trong nước"],
+        answer: 0,
+        explain: "Hội nhập giúp sản phẩm Việt Nam tiếp cận thị trường toàn cầu và thu hút nguồn vốn FDI khổng lồ."
+      },
+      {
+        question: "Câu 19: Để giảm thiểu thiên tai lũ quét ở vùng núi nước ta, giải pháp hàng đầu là gì?",
+        img: "https://images.unsplash.com/photo-1511497584788-8767611136f6?w=800&auto=format&fit=crop",
+        options: ["Xây nhà kiên cố", "Trồng và bảo vệ rừng đầu nguồn", "Đào thêm nhiều sông nhân tạo", "Sơ tán dân triệt để"],
+        answer: 1,
+        explain: "Rừng đầu nguồn giữ đất, giữ nước và hạn chế tối đa tốc độ chảy tràn gây ra lũ quét."
+      },
+      {
+        question: "Câu 20: Đảo và quần đảo có vai trò chiến lược quan trọng nào sau đây?",
+        img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop",
+        options: ["Khẳng định chủ quyền và phát triển kinh tế biển", "Chỉ làm nơi nghỉ dưỡng", "Không có giá trị kinh tế", "Chỉ dùng cho mục đích nông nghiệp"],
+        answer: 0,
+        explain: "Hệ thống đảo giúp khẳng định chủ quyền vùng biển, đồng thời tạo căn cứ phát triển kinh tế biển."
+      }
+    ];
+
+    let currentQ = 0;
+    let userAnswers = Array(quizData.length).fill(null);
+    let seconds = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        seconds++;
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        document.getElementById('timer').innerText = `Thời gian: ${m}:${s}`;
+      }, 1000);
+    }
+
+    function loadQuestion() {
+      const item = quizData[currentQ];
+      document.getElementById('q-number').innerText = `Câu ${currentQ + 1} / ${quizData.length}`;
+      document.getElementById('progress-fill').style.width = `${((currentQ + 1) / quizData.length) * 100}%`;
+      document.getElementById('q-text').innerText = item.question;
+      document.getElementById('q-img').src = item.img;
+
+      const optsContainer = document.getElementById('options-container');
+      optsContainer.innerHTML = '';
+
+      item.options.forEach((optText, index) => {
+        const btn = document.createElement('div');
+        btn.className = `option-btn ${userAnswers[currentQ] === index ? 'selected' : ''}`;
+        btn.onclick = () => selectOption(index);
+        btn.innerHTML = `
+          <div class="opt-letter">${String.fromCharCode(65 + index)}</div>
+          <div>${optText}</div>
+        `;
+        optsContainer.appendChild(btn);
+      });
+
+      document.getElementById('prev-btn').disabled = currentQ === 0;
+      document.getElementById('next-btn').innerText = currentQ === quizData.length - 1 ? 'Nộp Bài' : 'Câu Tiếp';
+    }
+
+    function selectOption(index) {
+      userAnswers[currentQ] = index;
+      loadQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQ > 0) {
+        currentQ--;
+        loadQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQ < quizData.length - 1) {
+        currentQ++;
+        loadQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      clearInterval(timerInterval);
+      document.getElementById('quiz-screen').style.display = 'none';
+      document.getElementById('result-screen').style.display = 'block';
+
+      let correctCount = 0;
+      userAnswers.forEach((ans, i) => {
+        if (ans === quizData[i].answer) correctCount++;
+      });
+
+      const finalScore = (correctCount / quizData.length) * 10;
+      document.getElementById('res-score').innerText = `${finalScore.toFixed(1)} / 10 Điểm (${correctCount}/${quizData.length} câu đúng)`;
+
+      let title = "";
+      let desc = "";
+      let badgeImg = "";
+
+      if (finalScore >= 8.5) {
+        title = "HỌC SINH XUẤT SẮC - CHUYÊN GIA ĐỊA LÝ!";
+        badgeImg = "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=400&auto=format&fit=crop";
+        desc = `<strong>Nhận xét:</strong> Bạn có nền tảng kiến thức Địa lý THPT cực kỳ vững chắc! Khả năng nhớ kiến thức tự nhiên, các vùng kinh tế và kỹ năng phân tích vô cùng tốt. Hãy tiếp tục phát huy ở kỳ thi thật nhé!`;
+      } else if (finalScore >= 6.5) {
+        title = "HỌC SINH KHÁ - KẾT QUẢ RẤT TỐT!";
+        badgeImg = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&auto=format&fit=crop";
+        desc = `<strong>Nhận xét:</strong> Bạn nắm khá vững các kiến thức trọng tâm. Chỉ cần ôn lại kỹ hơn một chút ở các phần sông ngòi hoặc chuyển dịch kinh tế là có thể đạt điểm tuyệt đối!`;
+      } else {
+        title = "CẦN CỐ GẮNG HƠN - HÃY ĐỌC KỸ LẠI SGK!";
+        badgeImg = "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&auto=format&fit=crop";
+        desc = `<strong>Nhận xét:</strong> Bạn đã hoàn thành bài thi nhưng kết quả chưa cao. Đừng lo lắng, hãy xem lại đáp án giải thích chi tiết bên dưới để bổ sung lại lỗ hổng kiến thức nhé!`;
+      }
+
+      document.getElementById('res-title').innerText = title;
+      document.getElementById('res-desc').innerHTML = desc;
+      document.getElementById('res-img').src = badgeImg;
+
+      const revContainer = document.getElementById('review-container');
+      revContainer.innerHTML = '';
+      quizData.forEach((q, i) => {
+        const isRight = userAnswers[i] === q.answer;
+        const div = document.createElement('div');
+        div.className = `review-card ${isRight ? 'correct' : 'incorrect'}`;
+        div.innerHTML = `
+          <strong>Câu ${i + 1}: ${q.question}</strong><br>
+          <span>• Bạn chọn: ${userAnswers[i] !== null ? String.fromCharCode(65 + userAnswers[i]) + '. ' + q.options[userAnswers[i]] : 'Chưa chọn'}</span><br>
+          <span>• Đáp án đúng: <strong>${String.fromCharCode(65 + q.answer)}. ${q.options[q.answer]}</strong></span><br>
+          <small style="color: #475569;">💡 <em>Giải thích: ${q.explain}</em></small>
+        `;
+        revContainer.appendChild(div);
+      });
+    }
+
+    function restartQuiz() {
+      currentQ = 0;
+      userAnswers = Array(quizData.length).fill(null);
+      seconds = 0;
+      document.getElementById('result-screen').style.display = 'none';
+      document.getElementById('quiz-screen').style.display = 'block';
+      startTimer();
+      loadQuestion();
+    }
+
+    startTimer();
+    loadQuestion();
+  </script>
+</body>
+</html>
